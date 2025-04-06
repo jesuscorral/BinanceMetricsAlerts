@@ -1,23 +1,19 @@
-from binance.client import Client
 import threading
 
-from rsi_service import *
-from draw_chart import *
-from database_service import *
-from binance_service import *
+from services.rsi_service import *
 
 # Parameters
-available_symbols = ["DOGE/USDT", "ADA/USDT","ETH/USDT", "BTC/USDT", "XRP/USDT", "LTC/USDT"]
-
-timeframe = '1d'
-database_name = "rsi.db"
-period = 6
+available_symbols = ["DOGE/USDC", "ADA/USDC","ETH/USDC", "BTC/USDC", "XRP/USDC", "LTC/USDC"]
+db_file = "rsi.db"
 table_name = "rsi_data"
 
-frequency = 300 # loop frequency in seconds 300
+timeframe = '1d'
+period = 6
+
+frequency = 900 # loop frequency in seconds 300
 
 # Create a connection to the SQLite database
-conn = create_connection(database_name)
+conn = create_connection(db_file)
 create_table_if_not_exists(conn, table_name)
 
 # Start the RSI monitoring in a separate thread

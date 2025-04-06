@@ -1,11 +1,10 @@
 import pandas as pd
-import ta
 from datetime import datetime, timezone
 import time
 
-from database_service import *
-from binance_service import *
-from notifications import *
+from services.database_service import *
+from services.binance_service import *
+from services.notifications import *
 
 def rsi_calc(ohlc: pd.DataFrame, period: int):
     delta = ohlc['close'].diff()
@@ -33,5 +32,5 @@ def monitor_rsi(symbols, period, frequency, conn, timeframe, table_name):
 
             print(f"rsi: {rsi_6_value}, symbol: {symbol}, price: {current_price}, timestamp: {utc_timestamp}")
             insert_data(conn, rsi_6_value, utc_timestamp, symbol, table_name)
-            check_rsi_threshold(rsi_6_value, symbol, current_price, timeframe)
+            check_conditions_to_send_notification(rsi_6_value, symbol, current_price, timeframe)
         time.sleep(frequency)  # Sleep for 'frequency' seconds

@@ -1,5 +1,7 @@
 {
     "python.analysis.extraPaths": [
-        "./TelegramBot"
-    ]
+        "./TelegramBot",
+        "./Services"
+    ],
+    "python-envs.pythonProjects": []
 }

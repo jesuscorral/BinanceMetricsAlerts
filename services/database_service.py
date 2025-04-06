@@ -4,12 +4,13 @@ def create_connection(db_file):
     conn = None
     try:
         conn = sqlite3.connect(db_file)
-    except Error as e:
+    except sqlite3.Error as e:
         print(e)
 
     return conn
 
 def create_table_if_not_exists(conn, table_name):
+    
     try:
         c = conn.cursor()
         c.execute(f'''
@@ -20,7 +21,7 @@ def create_table_if_not_exists(conn, table_name):
             time TEXT DEFAULT CURRENT_TIMESTAMP
         )
         ''')
-    except Error as e:
+    except sqlite3.Error as e:
         print(e)
         
 def insert_data(conn, rsi, time, symbol, table_name):
@@ -30,5 +31,5 @@ def insert_data(conn, rsi, time, symbol, table_name):
                 INSERT INTO {table_name} (rsi, pair, time) VALUES (?, ?, ?)
                 ''', (rsi, symbol, time)) 
         conn.commit()
-    except Error as e:
+    except sqlite3.Error as e:
         print(e)
