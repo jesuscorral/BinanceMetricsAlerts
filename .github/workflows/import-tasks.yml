@@ -1,0 +1,66 @@
+# Nombre del Workflow
+name: 🚀 Importar Tareas desde JSON
+
+# Disparador:
+# Esto permite ejecutar el workflow manualmente desde la pestaña "Actions"
+on:
+  workflow_dispatch:
+
+# Permisos:
+# Necesitamos permisos para leer el contenido (el JSON) y escribir issues.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  import-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Clona el repositorio para poder leer el archivo tasks.json
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 2. Lee el JSON, itera sobre cada tarea y crea un issue
+      - name: Crear Issues desde JSON
+        run: |
+          # Carga la URL del proyecto desde el secreto
+          PROJECT_URL="${{ secrets.PROJECT_URL }}"
+          
+          # Define la ruta a tu archivo JSON
+          JSON_FILE="tasks.json"
+
+          echo "Iniciando la importación de tareas desde $JSON_FILE..."
+          echo "Añadiendo a Proyecto: $PROJECT_URL"
+
+          # Usamos 'jq' para parsear el JSON y 'while' para iterar sobre cada tarea
+          # -c (compact) es importante para que 'read' procese línea por línea
+          jq -c '.[]' $JSON_FILE | while read task; do
+            
+            # Extrae los datos de cada tarea usando jq
+            # -r quita las comillas de los strings
+            TITLE=$(echo $task | jq -r '.title')
+            BODY=$(echo $task | jq -r '.description')
+            
+            # Convierte el array de labels ["label1", "label2"] 
+            # a un string separado por comas "label1,label2"
+            LABELS=$(echo $task | jq -r '.labels | join(",")')
+
+            echo "Creando tarea: $TITLE"
+
+            # El comando mágico de la CLI de GitHub:
+            # 1. Crea el issue con --title y --body
+            # 2. Añade las etiquetas con --label
+            # 3. Lo añade directamente al proyecto con --project
+            gh issue create --title "$TITLE" \
+                            --body "$BODY" \
+                            --label "$LABELS" \
+                            --project "$PROJECT_URL"
+          
+          done
+          
+          echo "✅ Importación completada."
+
+        # Autenticación:
+        # Usamos el GITHUB_TOKEN que GitHub Actions provee automáticamente
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
