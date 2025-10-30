@@ -1,17 +1,14 @@
 [
   {
     "title": "Configurar la base de datos",
-    "description": "Desplegar la instancia de PostgreSQL y configurar las tablas iniciales.",
-    "labels": ["backend", "database"]
+    "description": "Desplegar la instancia de PostgreSQL y configurar las tablas iniciales."
   },
   {
     "title": "Crear el endpoint de 'login'",
-    "description": "Implementar la lógica de autenticación con JWT.",
-    "labels": ["backend", "auth"]
+    "description": "Implementar la lógica de autenticación con JWT."
   },
   {
     "title": "Diseñar la vista de 'Home'",
-    "description": "Crear el componente de React para la página principal.",
-    "labels": ["frontend", "design"]
+    "description": "Crear el componente de React para la página principal."
   }
 ]
