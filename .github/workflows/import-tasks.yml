@@ -58,4 +58,5 @@ jobs:
         # Autenticación:
         # Usamos el GITHUB_TOKEN que GitHub Actions provee automáticamente
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          # Autenticación necesaria para la CLI de GitHub (gh)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
