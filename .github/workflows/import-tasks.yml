@@ -1,16 +1,16 @@
 # Nombre del Workflow
 name: 🚀 Importar Tareas desde JSON
 
-# Disparador
+# Disparador:
+# Esto permite ejecutar el workflow manualmente desde la pestaña "Actions"
 on:
   workflow_dispatch:
 
 # Permisos:
-# Necesitamos permisos para leer contenido, escribir issues Y ESCRIBIR ETIQUETAS
+# Necesitamos permisos para leer el contenido (el JSON) y escribir issues.
 permissions:
   contents: read
   issues: write
-  labels: write # <-- NUEVO: Permiso para crear etiquetas
 
 jobs:
   import-tasks:
@@ -23,48 +23,39 @@ jobs:
       # 2. Lee el JSON, itera sobre cada tarea y crea un issue
       - name: Crear Issues desde JSON
         run: |
+          # Carga la URL del proyecto desde el secreto
           PROJECT_URL="${{ secrets.PROJECT_URL }}"
+          
+          # Define la ruta a tu archivo JSON
           JSON_FILE="tasks.json"
 
           echo "Iniciando la importación de tareas desde $JSON_FILE..."
           echo "Añadiendo a Proyecto: $PROJECT_URL"
 
+          # Usamos 'jq' para parsear el JSON y 'while' para iterar sobre cada tarea
+          # -c (compact) es importante para que 'read' procese línea por línea
           jq -c '.[]' $JSON_FILE | while read task; do
             
-            # --- INICIO: NUEVO BLOQUE PARA CREAR ETIQUETAS ---
-            echo "Verificando etiquetas..."
-            
-            # Itera sobre cada etiqueta en el array 'labels' del JSON
-            echo $task | jq -r '.labels[]' | while read label; do
-              if [ -n "$label" ]; then # Asegura que la etiqueta no esté vacía
-                echo "Asegurando que la etiqueta '$label' exista..."
-                
-                # Intenta crear la etiqueta.
-                # Si ya existe, el comando fallará, pero `|| true` 
-                # captura el error y permite que el script continúe.
-                gh label create "$label" --color "f29513" --description "Etiqueta autogenerada por importación" || true
-              fi
-            done
-            # --- FIN: NUEVO BLOQUE PARA CREAR ETIQUETAS ---
-
-            # Extrae los datos de la tarea (como antes)
+            # Extrae los datos de cada tarea usando jq
+            # -r quita las comillas de los strings
             TITLE=$(echo $task | jq -r '.title')
             BODY=$(echo $task | jq -r '.description')
-            LABELS=$(echo $task | jq -r '.labels | join(",")')
+            
 
             echo "Creando tarea: $TITLE"
 
-            # Crea el issue (como antes)
-            # Ahora estamos seguros de que las etiquetas existen
+            # El comando mágico de la CLI de GitHub:
+            # 1. Crea el issue con --title y --body
+            # 2. Lo añade directamente al proyecto con --project
             gh issue create --title "$TITLE" \
                             --body "$BODY" \
-                            --label "$LABELS" \
                             --project "$PROJECT_URL"
           
           done
           
           echo "✅ Importación completada."
 
-        # Autenticación (como antes)
+        # Autenticación:
+        # Usamos el GITHUB_TOKEN que GitHub Actions provee automáticamente
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
