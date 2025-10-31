@@ -10,20 +10,28 @@ jobs:
   create-tasks:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Read tasks from JSON and create them
+      - name: Create tasks from JSON
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
         run: |
-          for row in $(jq -c '.[]' tasks.json); do
-            TITLE=$(echo $row | jq -r '.title')
-            BODY=$(echo $row | jq -r '.body')
+          if [ ! -f tasks.json ]; then
+            echo "tasks.json file not found!"
+            exit 1
+          fi
+
+          # Read each JSON object safely
+          cat tasks.json | jq -c '.[]' | while read row; do
+            TITLE=$(echo "$row" | jq -r '.title')
+            BODY=$(echo "$row" | jq -r '.body')
+
+            echo "Creating issue: $TITLE"
 
             # Create the issue
             ISSUE=$(curl -s -X POST \
@@ -32,9 +40,9 @@ jobs:
               https://api.github.com/repos/${{ github.repository }}/issues \
               -d "{\"title\":\"$TITLE\",\"body\":\"$BODY\"}")
 
-            ISSUE_NODE_ID=$(echo $ISSUE | jq -r '.node_id')
+            ISSUE_NODE_ID=$(echo "$ISSUE" | jq -r '.node_id')
 
-            # Add issue to project
+            # Add issue to the project
             curl -s -X POST \
               -H "Authorization: Bearer $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
@@ -43,5 +51,5 @@ jobs:
               -d "{\"query\":\"mutation(\$project:ID!,\$content:ID!){addProjectV2ItemById(input:{projectId:\$project, contentId:\$content}){item{id}}}\",
                    \"variables\":{\"project\":\"$PROJECT_ID\",\"content\":\"$ISSUE_NODE_ID\"}}"
 
-            echo "Created: $TITLE"
+            echo "Added to project: $TITLE"
           done
