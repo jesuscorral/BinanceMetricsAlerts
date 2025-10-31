@@ -1,5 +1,4 @@
 [
-  { "title": "Setup CI pipeline", "body": "Implement GitHub Actions workflow" },
-  { "title": "Integrate database", "body": "Connect to Azure SQL" },
-  { "title": "Add user authentication", "body": "Implement JWT login" }
+  { "title": "Setup CI pipeline", "body": "Implement GitHub Actions workflow", "project": "CryptoAISentinel" },
+  { "title": "Integrate database", "body": "Connect to Azure SQL", "project": "CryptoAISentinel" }
 ]
