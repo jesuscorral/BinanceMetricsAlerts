@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraSignal - AI-Powered Crypto Signals</title>
+    <!-- Tailwind CSS (local build) -->
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Primary background */
+            color: #E2E8F0; /* slate-200 */
+        }
+        /* Keyframe for subtle glow animation */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.8), 0 0 20px rgba(6, 182, 212, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.4); }
+        }
+        .ai-chart-container {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        /* Specific styles for SVG elements for better control */
+        .ai-prediction-path { 
+            stroke: var(--tw-colors-accent); 
+            stroke-width: 1.8; 
+            filter: url(#glowPath);
+            fill: none;
+        }
+        .ai-signal-point { 
+            fill: var(--tw-colors-cyan-accent); 
+            filter: url(#glowDot); 
+            stroke: #FFFFFF; 
+            stroke-width: 0.5;
+        }
+        .ai-signal-label { 
+            fill: #FFFFFF; 
+            font-size: 3px; 
+            font-weight: bold; 
+            text-anchor: middle; 
+            filter: url(#textGlow);
+        }
+        .volume-bar-green { fill: rgba(16, 185, 129, 0.6); } /* Tailwind emerald-500 with opacity */
+        .volume-bar-red { fill: rgba(239, 68, 68, 0.6); } /* Tailwind red-500 with opacity */
+        .chart-grid-line { stroke: var(--tw-colors-chart-grid); stroke-width: 0.2; }
+        .chart-label { fill: #E2E8F0; font-size: 2px; }
+
+        /* Custom candlestick helper for SVG (better definition) */
+        .candlestick {
+            stroke-width: 0.5;
+        }
+        .candlestick.green .body { fill: var(--tw-colors-candle-green); }
+        .candlestick.green .wick { stroke: var(--tw-colors-candle-green); }
+        .candlestick.red .body { fill: var(--tw-colors-candle-red); }
+        .candlestick.red .wick { stroke: var(--tw-colors-candle-red); }
+
+        /* --- STYLES FOR NEW AI GRAPHIC --- */
+        @keyframes pulse-neuron {
+            0%, 100% { fill: var(--tw-colors-accent); opacity: 0.8; }
+            50% { fill: var(--tw-colors-cyan-accent); opacity: 1; }
+        }
+        @keyframes pulse-connection {
+            0%, 100% { stroke: var(--tw-colors-accent); opacity: 0.3; }
+            50% { stroke: var(--tw-colors-cyan-accent); opacity: 0.7; }
+        }
+        .ai-brain-neuron {
+            animation: pulse-neuron 4s infinite ease-in-out;
+        }
+        .ai-brain-connection {
+            stroke-width: 0.2;
+            animation: pulse-connection 3s infinite ease-in-out;
+        }
+        /* Stagger animations for a more dynamic feel */
+        .ai-brain-neuron:nth-child(even) { animation-delay: -2s; }
+        .ai-brain-connection:nth-child(odd) { animation-delay: -1.5s; }
+        /* --- END OF STYLES FOR NEW AI GRAPHIC --- */
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header --><header class="absolute top-0 left-0 w-full z-10 py-5 px-4 md:px-8">
+        <nav class="container mx-auto max-w-6xl flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">AuraSignal</a>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="text-slate-300 hover:text-white hidden md:block">Login</a>
+                <a href="#cta" class="bg-accent text-white font-medium py-2 px-5 rounded-lg shadow-md hover:bg-accent-hover transition duration-300">
+                    Get Started Free
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section --><section class="relative pt-32 pb-20 md:pt-48 md:pb-28 overflow-hidden">
+            <div class="container mx-auto max-w-6xl px-4 z-10 relative">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <!-- Text Content --><div class="md:w-1/2 text-center md:text-left">
+                        <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
+                            Stop Watching Charts.
+                            <span class="block text-cyan-accent">Start Receiving AI Signals.</span>
+                        </h1>
+                        <p class="text-lg md:text-xl text-slate-300 mb-8">
+                            Our predictive AI transforms complex metrics into simple, actionable Buy/Sell/Hold signals—sent straight to your Email or Telegram.
+                        </p>
+                        <a href="#cta" class="bg-accent text-white text-lg font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-accent-hover transition duration-300">
+                            Start Receiving Signals
+                        </a>
+                    </div>
+                    
+                    <!-- Visual Element (Hero) - IMPROVED, REALISTIC CHART --><div class="md:w-1/2">
+                        <div class="relative rounded-lg p-4 backdrop-blur-sm bg-slate-800/50 border border-slate-700 shadow-2xl ai-chart-container">
+                            <div class="aspect-video flex items-center justify-center relative">
+                                <svg class="w-full h-full" viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <style>
+                                        /* Basic styles for SVG text to inherit font */
+                                        text {
+                                            font-family: 'Inter', sans-serif;
+                                        }
+                                    </style>
+                                    
+                                    <!-- Background Grid Lines --><line x1="10" y1="10" x2="90" y2="10" class="chart-grid-line"/>
+                                    <line x1="10" y1="25" x2="90" y2="25" class="chart-grid-line"/>
+                                    <line x1="10" y1="40" x2="90" y2="40" class="chart-grid-line"/>
+                                    <line x1="10" y1="55" x2="90" y2="55" class="chart-grid-line"/>
+                                    
+                                    <!-- Price Labels --><text x="8" y="11" class="chart-label">$72K</text>
+                                    <text x="8" y="26" class="chart-label">$68K</text>
+                                    <text x="8" y="41" class="chart-label">$64K</text>
+                                    <text x="8" y="56" class="chart-label">$60K</text>
+
+                                    <!--
+                                        NEW REALISTIC CANDLESTICKS
+                                        OHLC (Open, High, Low, Close) logic applied.
+                                        One candle's open is the previous candle's close.
+                                    -->
+                                    <g id="realistic-candlesticks">
+                                        <!-- 1. x=15 (Green) O:50, C:45, H:43, L:52 -->
+                                        
+                                        <rect x="14" y="45" width="2" height="5" class="candlestick green body"/>
+                                        <!-- 2. x=20 (Green) O:45, C:40, H:38, L:46 -->
+                                        
+                                        <rect x="19" y="40" width="2" height="5" class="candlestick green body"/>
+                                        <!-- 3. x=25 (Red) O:40, C:43, H:39, L:45 -->
+                                        
+                                        <rect x="24" y="40" width="2" height="3" class="candlestick red body"/>
+                                        <!-- 4. x=30 (Red) O:43, C:48, H:42, L:50 (THE DIP) -->
+                                        
+                                        <rect x="29" y="43" width="2" height="5" class="candlestick red body"/>
+                                        <!-- 5. x=35 (Green) O:48, C:42, H:40, L:49 -->
+                                        
+                                        <rect x="34" y="42" width="2" height="6" class="candlestick green body"/>
+                                        <!-- 6. x=40 (Green) O:42, C:35, H:33, L:43 -->
+                                        
+                                        <rect x="39" y="35" width="2" height="7" class="candlestick green body"/>
+                                        <!-- 7. x=45 (Green) O:35, C:30, H:28, L:36 -->
+                                        
+                                        <rect x="44" y="30" width="2" height="5" class="candlestick green body"/>
+                                        <!-- 8. x=50 (Red) O:30, C:33, H:29, L:35 -->
+                                        
+                                        <rect x="49" y="30" width="2" height="3" class="candlestick red body"/>
+                                        <!-- 9. x=55 (Green) O:33, C:25, H:24, L:34 -->
+                                        
+                                        <rect x="54" y="25" width="2" height="8" class="candlestick green body"/>
+                                        <!-- 10. x=60 (Green) O:25, C:20, H:18, L:26 -->
+                                        
+                                        <rect x="59" y="20" width="2" height="5" class="candlestick green body"/>
+                                        <!-- 11. x=65 (Green) O:20, C:15, H:14, L:21 -->
+                                        
+                                        <rect x="64" y="15" width="2" height="5" class="candlestick green body"/>
+                                        <!-- 12. x=70 (Red) O:15, C:18, H:14, L:20 (THE PEAK) -->
+                                        
+                                        <rect x="69" y="15" width="2" height="3" class="candlestick red body"/>
+                                        <!-- 13. x=75 (Red) O:18, C:22, H:17, L:24 -->
+                                        
+                                        <rect x="74" y="18" width="2" height="4" class="candlestick red body"/>
+                                        <!-- 14. x=80 (Red) O:22, C:25, H:21, L:27 -->
+                                        
+                                        <rect x="79" y="22" width="2" height="3" class="candlestick red body"/>
+                                    </g>
+
+                                    <!-- AI Prediction Line (Adjusted to new candle path) -->
+                                    <path d="M15 45 L20 40 L25 43 L30 48 L35 42 L40 35 L45 30 L50 33 L55 25 L60 20 L65 15 L70 18 L75 22 L80 25" 
+                                          class="ai-prediction-path"/>
+                                    <path d="M15 45 L20 40 L25 43 L30 48 L35 42 L40 35 L45 30 L50 33 L55 25 L60 20 L65 15 L70 18 L75 22 L80 25" 
+                                          stroke="#6366F1" stroke-width="0.5" fill="none" stroke-dasharray="2 1" opacity="0.8"/>
+
+                                    <!-- AI Signal 1: BUY at the DIP (x=30) -->
+                                    <g id="buy-signal">
+                                        <circle cx="30" cy="50" r="2.5" class="ai-signal-point"/>
+                                        <text x="30" y="46" class="ai-signal-label">BUY</text>
+                                        <!-- F&G Meter for BUY (Smaller and more subtle) -->
+                                        <g transform="translate(20, 52) scale(0.4)">
+                                            <path d="M 10 30 A 15 15 0 0 1 40 30" stroke="#4B5563" stroke-width="2" fill="none"/>
+                                            <path d="M 10 30 A 15 15 0 0 1 14.7 18.2" stroke="#EF4444" stroke-width="3" fill="none" /> <!-- Fear Zone -->
+                                            <path d="M 35.3 18.2 A 15 15 0 0 1 40 30" stroke="#10B981" stroke-width="2" fill="none" /> <!-- Greed Zone -->
+                                            <text x="8" y="36" class="chart-label" font-size="4">Fear</text>
+                                            <text x="30" y="36" class="chart-label" font-size="4">Greed</text>
+                                            <!-- Needle pointing to FEAR -->
+                                            <line x1="25" y1="30" x2="14" y2="19" stroke="white" stroke-width="1.5" transform-origin="25 30" /> 
+                                        </g>
+                                    </g>
+                                    
+                                    <!-- AI Signal 2: SELL at the PEAK (x=70) -->
+                                    <g id="sell-signal">
+                                        <circle cx="70" cy="14" r="2.5" fill="#EF4444" filter="url(#glowDot)" stroke="#FFFFFF" stroke-width="0.5"/>
+                                        <text x="70" y="10" class="ai-signal-label">SELL</text>
+                                        <!-- F&G Meter for SELL (Smaller and more subtle) -->
+                                        <g transform="translate(59, 16) scale(0.4)">
+                                            <path d="M 10 30 A 15 15 0 0 1 40 30" stroke="#4B5563" stroke-width="2" fill="none"/>
+                                            <path d="M 10 30 A 15 15 0 0 1 14.7 18.2" stroke="#EF4444" stroke-width="2" fill="none" /> <!-- Fear Zone -->
+                                            <path d="M 35.3 18.2 A 15 15 0 0 1 40 30" stroke="#10B981" stroke-width="3" fill="none" /> <!-- Greed Zone -->
+                                            <text x="8" y="36" class="chart-label" font-size="4">Fear</text>
+                                            <text x="30" y="36" class="chart-label" font-size="4">Greed</text>
+                                            <!-- Needle pointing to GREED -->
+                                            <line x1="25" y1="30" x2="36" y2="19" stroke="white" stroke-width="1.5" transform-origin="25 30" /> 
+                                        </g>
+                                    </g>
+
+                                    <!-- Volume Chart (REMOVED for cleaner look) -->
+                                    
+
+                                    
+                                    <defs>
+                                        <!-- Glow filter for the AI prediction path --><filter id="glowPath">
+                                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <!-- Glow filter for the signal dots --><filter id="glowDot">
+                                            <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <!-- Text Glow for labels --><filter id="textGlow">
+                                            <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+                                            <feOffset dx="0" dy="0" in="coloredBlur" result="offsetBlur"/>
+                                            <feFlood flood-color="#FFFFFF" flood-opacity="0.6" result="floodColor"/>
+                                            <feComposite in="floodColor" in2="offsetBlur" operator="in" result="comp"/>
+                                            <feMerge>
+                                                <feMergeNode in="comp"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <span class="absolute top-4 left-4 text-sm font-semibold text-white">BTC/USD Real-Time Analysis</span>
+                            <span class="absolute bottom-4 right-4 text-xs text-slate-400">Powered by AuraSignal AI</span>
+                            
+                            <!-- **REMOVED** Old Fear & Greed Index Text -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Background Glow --><div class="absolute -top-20 -left-20 w-80 h-80 bg-accent rounded-full opacity-20 blur-3xl"></div>
+            <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-cyan-accent rounded-full opacity-20 blur-3xl"></div>
+        </section>
+
+        <!-- How It Works --><section class="py-20 md:py-28 bg-primary">
+            <div class="container mx-auto max-w-6xl px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">How It Works in 3 Simple Steps</h2>
+                    <p class="text-lg text-slate-300 max-w-2xl mx-auto">Get actionable insights without the complexity. Your AI signal is just moments away.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+                    <!-- Step 1 --><div class="text-center p-6 bg-slate-800/50 rounded-lg border border-slate-700">
+                        <div class="text-4xl font-bold text-accent mb-4">1</div>
+                        <h3 class="text-xl font-semibold text-white mb-2">AI Analyzes Data</h3>
+                        <p class="text-slate-300">Our AI scans millions of data points 24/7—social sentiment, volume anomalies, and on-chain metrics—so you don't have to.</p>
+                    </div>
+                    <!-- Step 2 --><div class="text-center p-6 bg-slate-800/50 rounded-lg border border-slate-700">
+                        <div class="text-4xl font-bold text-accent mb-4">2</div>
+                        <h3 class="text-xl font-semibold text-white mb-2">AI Generates Signal</h3>
+                        <p class="text-slate-300">When key conditions are met, the system generates a high-confidence Buy, Sell, or Hold signal for a specific asset.</p>
+                    </div>
+                    <!-- Step 3 --><div class="text-center p-6 bg-slate-800/50 rounded-lg border border-slate-700">
+                        <div class="text-4xl font-bold text-accent mb-4">3</div>
+                        <h3 class="text-xl font-semibold text-white mb-2">You Receive the Alert</h3>
+                        <p class="text-slate-300">Get an instant notification via Email or Telegram. No charts, no noise. Just the actionable signal you need.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The AI Advantage --><section class="py-20 md:py-28">
+            <div class="container mx-auto max-w-6xl px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">The AI Advantage</h2>
+                        <p class="text-lg text-slate-300 mb-6">The market is 24/7, emotional, and overwhelming. Human analysis has limits. Our AI doesn't.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-cyan-accent flex-shrink-0 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h4 class="font-semibold text-white">Deep Learning Analysis</h4>
+                                    <p class="text-slate-300">Finds complex patterns in price action and volume that human traders miss.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-cyan-accent flex-shrink-0 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h4 class="font-semibold text-white">Real-Time Sentiment Scoring</h4>
+                                    <p class="text-slate-300">Quantifies market hype and fear from social data to predict sentiment shifts.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-cyan-accent flex-shrink-0 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h4 class="font-semibold text-white">24/7 Unbiased Monitoring</h4>
+                                    <p class="text-slate-300">Our AI never sleeps and never trades on emotion. Get pure, data-driven insights.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="md:w-1/2">
+                        <!-- NEW, More Impactful "AI Brain" / Network Graphic -->
+                        <div class="relative w-full h-80 flex items-center justify-center">
+                            <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <filter id="glow3">
+                                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                
+                                <g transform="translate(100, 100)">
+                                    <!-- Center Neuron (The "Brain") -->
+                                    <circle cx="0" cy="0" r="12" fill="#FFFFFF" filter="url(#glow3)"/>
+                                    
+                                    <!-- Layers of Neurons and Connections -->
+                                    <g id="layer1" transform="scale(1.5)">
+                                        <circle cx="-50" cy="0" r="4" class="ai-brain-neuron"/>
+                                        <line x1="-50" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="50" cy="0" r="4" class="ai-brain-neuron"/>
+                                        <line x1="50" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="-50" r="4" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="-50" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="50" r="4" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="50" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-35" cy="-35" r="4" class="ai-brain-neuron"/>
+                                        <line x1="-35" y1="-35" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="35" cy="-35" r="4" class="ai-brain-neuron"/>
+                                        <line x1="35" y1="-35" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-35" cy="35" r="4" class="ai-brain-neuron"/>
+                                        <line x1="-35" y1="35" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="35" cy="35" r="4" class="ai-brain-neuron"/>
+                                        <line x1="35" y1="35" x2="0" y2="0" class="ai-brain-connection"/>
+                                    </g>
+                                    
+                                    <g id="layer2" transform="scale(2.5)" opacity="0.6">
+                                        <circle cx="-30" cy="0" r="3" class="ai-brain-neuron"/>
+                                        <line x1="-30" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="30" cy="0" r="3" class="ai-brain-neuron"/>
+                                        <line x1="30" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="-30" r="3" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="-30" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="30" r="3" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="30" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-21" cy="-21" r="3" class="ai-brain-neuron"/>
+                                        <line x1="-21" y1="-21" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="21" cy="-21" r="3" class="ai-brain-neuron"/>
+                                        <line x1="21" y1="-21" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-21" cy="21" r="3" class="ai-brain-neuron"/>
+                                        <line x1="-21" y1="21" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="21" cy="21" r="3" class="ai-brain-neuron"/>
+                                        <line x1="21" y1="21" x2="0" y2="0" class="ai-brain-connection"/>
+                                    </g>
+
+                                    <g id="layer3" transform="scale(3.5)" opacity="0.3">
+                                        <circle cx="-20" cy="0" r="2" class="ai-brain-neuron"/>
+                                        <line x1="-20" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="20" cy="0" r="2" class="ai-brain-neuron"/>
+                                        <line x1="20" y1="0" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="-20" r="2" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="-20" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="0" cy="20" r="2" class="ai-brain-neuron"/>
+                                        <line x1="0" y1="20" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-14" cy="-14" r="2" class="ai-brain-neuron"/>
+                                        <line x1="-14" y1="-14" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="14" cy="-14" r="2" class="ai-brain-neuron"/>
+                                        <line x1="14" y1="-14" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="-14" cy="14" r="2" class="ai-brain-neuron"/>
+                                        <line x1="-14" y1="14" x2="0" y2="0" class="ai-brain-connection"/>
+                                        <circle cx="14" cy="14" r="2" class="ai-brain-neuron"/>
+                                        <line x1="14" y1="14" x2="0" y2="0" class="ai-brain-connection"/>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features & Alerts --><section class="py-20 md:py-28 bg-slate-800/50 border-y border-slate-700">
+            <div class="container mx-auto max-w-6xl px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Features Designed for Action</h2>
+                    <p class="text-lg text-slate-300 max-w-2xl mx-auto">All signal, no noise. Get exactly what you need, where you need it.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Feature 1: Buy/Sell Signals --><div class="p-6 bg-primary rounded-lg border border-slate-700">
+                        <h3 class="text-xl font-semibold text-white mb-2">1. Predictive Buy/Sell Signals</h3>
+                        <p class="text-slate-300">Receive clear, AI-generated signals (Buy, Sell, or Hold) for assets showing high-probability moves.</p>
+                    </div>
+                    <!-- Feature 2: Price Alerts --><div class="p-6 bg-primary rounded-lg border border-slate-700">
+                        <h3 class="text-xl font-semibold text-white mb-2">2. Custom Price Alerts</h3>
+                        <p class="text-slate-300">Want to monitor a specific price? Set a custom alert (e.g., 'BTC > $70k') and let our system watch it for you.</p>
+                    </div>
+                    <!-- Feature 3: Delivery Channels --><div class="p-6 bg-primary rounded-lg border border-slate-700">
+                        <h3 class="text-xl font-semibold text-white mb-2">3. Email & Telegram Delivery</h3>
+                        <p class="text-slate-300">Get your alerts instantly, wherever you are. We integrate directly with Email and Telegram for immediate delivery.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonial --><section class="py-20 md:py-28">
+            <div class="container mx-auto max-w-3xl px-4 text-center">
+                <blockquote class="text-2xl md:text-3xl font-semibold text-white leading-snug">
+                    "I used to spend 3-4 hours a day just checking charts. With AuraSignal, I get the 2-3 alerts that actually matter per week. I've saved so much time and my portfolio has never been healthier."
+                </blockquote>
+                <p class="mt-6 text-lg font-medium text-cyan-accent">
+                    - Sarah K, Full-Time Trader
+                </p>
+            </div>
+        </section>
+
+        <!-- Final Call to Action --><section id="cta" class="py-20 md:py-28 bg-slate-800/50">
+            <div class="container mx-auto max-w-3xl px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Stop Guessing. Start Winning.</h2>
+                <p class="text-lg text-slate-300 mb-8 max-w-xl mx-auto">Get your first 7 days of AI-powered signals completely free. No credit card required. See the difference data-driven alerts can make.</p>
+                <a href="#" class="bg-accent text-white text-lg font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-accent-hover transition duration-300">
+                    Try Free for 7 Days
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer --><footer class="py-12 bg-primary">
+        <div class="container mx-auto max-w-6xl px-4 text-center">
+            <p class="text-slate-400">© 2025 AuraSignal. All rights reserved. Not financial advice.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="text-slate-400 hover:text-white">Privacy Policy</a>
+                <a href="#" class="text-slate-400 hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+
+
